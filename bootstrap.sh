@@ -17,7 +17,6 @@ LOCAL_ETC=~/.local/etc
 LOCAL_BIN=~/.local/bin
 mkdir -p $LOCAL_ETC
 mkdir -p $LOCAL_BIN
-mkdir -p ~/.tmux/resurrect
 
 # git clone respository
 cd ~/.local/
@@ -47,6 +46,8 @@ echo ". $LOCAL_ETC/init.sh" >>~/.bashrc
 # sed -i "\:$LOCAL_ETC/vimrc.vim:d" ~/.vimrc
 # echo "source $LOCAL_ETC/vimrc.vim" >>~/.vimrc
 
+mkdir -p ~/.tmux/resurrect
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 # source tmux.conf
 touch ~/.tmux.conf
 sed -i "\:$LOCAL_ETC/tmux.conf:d" ~/.tmux.conf

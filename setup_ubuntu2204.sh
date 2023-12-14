@@ -7,8 +7,8 @@ USE_CACHE=true
 #######################################################################
 # pre install
 #######################################################################
-sudo apt install -y gcc make g++ tmux bison bash-completion subversion \
-    tig unzip cmake luarocks
+sudo apt update
+sudo apt install -y build-essential git tmux bison bash-completion tig unzip cmake luarocks
 
 #######################################################################
 # install python3
