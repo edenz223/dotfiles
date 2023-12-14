@@ -1,0 +1,23 @@
+#! /usr/bin/env bash
+
+# 加密(执行后获得加密码)
+# echo abc | openssl aes-128-cbc -pbkdf2 -base64 -k 123
+#解密(加密码太长,用*表示了)
+# echo U2FsdGVkX18iCeXDtWVTHHbZ3lxJ81rmTYHleIWxrdY= | openssl aes-128-cbc -pbkdf2 -d -base64 -k 123
+
+if [ -z $1 ]; then
+    echo -n "Inpur password:"
+    read -s password
+    echo
+else
+    password = $1
+fi
+
+name=`echo U2FsdGVkX18jBTC9J+MygjgepUME9+FLXhBd4bljFIg= | openssl enc -aes-128-cbc -pbkdf2 -nosalt -base64 -d -k $password`
+email=`echo U2FsdGVkX18OFXDjYfXjbEKUp/UuyKFhKX34GPXwpbgPTZBuzjwHdEEGV7H0TUMu | openssl enc -aes-128-cbc -pbkdf2 -nosalt -base64 -d -k $password`
+echo "Git info:"
+echo $name
+echo $email
+git config --global user.name $name
+git config --global user.email $email
+
