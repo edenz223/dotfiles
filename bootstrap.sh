@@ -47,7 +47,9 @@ echo ". $LOCAL_ETC/init.sh" >>~/.bashrc
 # echo "source $LOCAL_ETC/vimrc.vim" >>~/.vimrc
 
 mkdir -p ~/.tmux/resurrect
-git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+if [ ! -d ~/.tmux/plugins/tpm ]; then
+	git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+fi
 # source tmux.conf
 touch ~/.tmux.conf
 sed -i "\:$LOCAL_ETC/tmux.conf:d" ~/.tmux.conf
