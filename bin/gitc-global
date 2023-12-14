@@ -13,8 +13,8 @@ else
     password = $1
 fi
 
-name=`echo U2FsdGVkX1+HuCH+odlXjAC+K9CMc2NcUUX2gXoEkjM= | openssl enc -aes-128-cbc -pbkdf2 -nosalt -base64 -d -k $password`
-email=`echo U2FsdGVkX18MPidVh0Md/FnINxNF3ANyifXi7ZCJF80NU7eKeJfcehPkWY5zVk6K | openssl enc -aes-128-cbc -pbkdf2 -nosalt -base64 -d -k $password`
+name=`echo U2FsdGVkX1+HuCH+odlXjAC+K9CMc2NcUUX2gXoEkjM= | openssl enc -aes-128-cbc -pbkdf2 -base64 -d -k $password`
+email=`echo U2FsdGVkX18MPidVh0Md/FnINxNF3ANyifXi7ZCJF80NU7eKeJfcehPkWY5zVk6K | openssl enc -aes-128-cbc -pbkdf2 -base64 -d -k $password`
 echo "Git info:"
 echo $name
 echo $email
