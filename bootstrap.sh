@@ -34,6 +34,7 @@ cp bootstrap.sh $LOCAL_BIN/
 if [ $machine == "Linux" ]; then
 	echo "install nvim"
 	bash ~/.local/dotfiles/setup_ubuntu2204.sh
+    sudo chsh -s $(which zsh)
 fi
 
 # source init.sh

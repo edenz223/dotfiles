@@ -79,28 +79,28 @@ fi
 #######################################################################
 # Ctags install
 #######################################################################
-CTAGS_SRC_DIR=$HOME/.local/packages/ctags
-CTAGS_DIR=$HOME/.local/tools/ctags
-CTAGS_LINK="https://github.com/universal-ctags/ctags.git"
-if [[ "$USE_CACHE" = false || ! -f "$CTAGS_DIR/bin/ctags" ]]; then
-    echo "Install ctags"
+# CTAGS_SRC_DIR=$HOME/.local/packages/ctags
+# CTAGS_DIR=$HOME/.local/tools/ctags
+# CTAGS_LINK="https://github.com/universal-ctags/ctags.git"
+# if [[ "$USE_CACHE" = false || ! -f "$CTAGS_DIR/bin/ctags" ]]; then
+#     echo "Install ctags"
 
-    if [[ ! -d $CTAGS_SRC_DIR ]]; then
-        mkdir -p "$CTAGS_SRC_DIR"
-    else
-        # Prevent an incomplete download.
-        rm -rf "$CTAGS_SRC_DIR"
-    fi
+#     if [[ ! -d $CTAGS_SRC_DIR ]]; then
+#         mkdir -p "$CTAGS_SRC_DIR"
+#     else
+#         # Prevent an incomplete download.
+#         rm -rf "$CTAGS_SRC_DIR"
+#     fi
 
-    git clone --depth=1 "$CTAGS_LINK" "$CTAGS_SRC_DIR" && cd "$CTAGS_SRC_DIR"
-    ./autogen.sh && ./configure --prefix="$CTAGS_DIR"
-    make -j && make install
+#     git clone --depth=1 "$CTAGS_LINK" "$CTAGS_SRC_DIR" && cd "$CTAGS_SRC_DIR"
+#     ./autogen.sh && ./configure --prefix="$CTAGS_DIR"
+#     make -j && make install
 
-    sed -i "\:"$CTAGS_DIR/bin":d" "$HOME/.bashrc"
-    echo "export PATH=\"$CTAGS_DIR/bin:\$PATH\"" >> "$HOME/.bashrc"
-else
-    echo "ctags is already installed. Skip installing it."
-fi
+#     sed -i "\:"$CTAGS_DIR/bin":d" "$HOME/.bashrc"
+#     echo "export PATH=\"$CTAGS_DIR/bin:\$PATH\"" >> "$HOME/.bashrc"
+# else
+#     echo "ctags is already installed. Skip installing it."
+# fi
 
 #######################################################################
 # Nvim install
