@@ -2,7 +2,6 @@
 export LD_RUN_PATH=$HOME/.local/lib:$LD_RUN_PATH
 export LD_LIBRARY_PATH=$HOME/.local/lib:$LD_LIBRARY_PATH
 export PKG_CONFIG_PATH=$HOME/.local/lib/pkgconfig:$PKG_CONFIG_PATH
-chsh -s $(which zsh)
 
 # for http proxy
 # export proxy_addr=
