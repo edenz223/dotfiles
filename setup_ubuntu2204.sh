@@ -10,6 +10,8 @@ USE_CACHE=true
 sudo apt update
 sudo apt install -y build-essential zsh tmux bison bash-completion tig unzip cmake luarocks
 
+chsh -s $(which zsh)
+
 #######################################################################
 # install python3
 #######################################################################
@@ -170,6 +172,6 @@ sed -i '/^source \$ZSH\/oh-my-zsh.sh/i fpath+=${ZSH_CUSTOM:-${ZSH:-~/.oh-my-zsh}
 sed -i 's/plugins=(git)/plugins=(git zsh-autosuggestions zsh-syntax-highlighting sudo)/g' ~/.zshrc
 
 # 使更改生效
-source ~/.zshrc
+# source ~/.zshrc
 
 echo "Finished installing oh-my-zsh and its dependencies!"
