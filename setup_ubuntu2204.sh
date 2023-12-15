@@ -10,7 +10,7 @@ USE_CACHE=true
 sudo apt update
 sudo apt install -y build-essential zsh tmux bison bash-completion tig unzip cmake luarocks
 
-sudo chsh -s $(which zsh)
+sudo chsh -s "$(which zsh)" "${USER}"
 
 #######################################################################
 # install python3
