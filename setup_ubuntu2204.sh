@@ -8,7 +8,7 @@ USE_CACHE=true
 # pre install
 #######################################################################
 sudo apt update
-sudo apt install -y build-essential git tmux bison bash-completion tig unzip cmake luarocks
+sudo apt install -y build-essential zsh tmux bison bash-completion tig unzip cmake luarocks
 
 #######################################################################
 # install python3
@@ -149,3 +149,27 @@ else
 fi
 
 echo "Finished installing Nvim and its dependencies!"
+
+
+# 安装 oh-my-zsh
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+# 安装 zsh-autosuggestions 插件
+git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+
+# 安装 zsh-syntax-highlighting 插件
+git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+
+# 安装 zsh-completions 插件
+git clone https://github.com/zsh-users/zsh-completions ${ZSH_CUSTOM:-${ZSH:-~/.oh-my-zsh}/custom}/plugins/zsh-completions、
+
+# 在 .zshrc 文件中添加一行来更新 FPATH
+sed -i '/^source \$ZSH\/oh-my-zsh.sh/i fpath+=${ZSH_CUSTOM:-${ZSH:-~/.oh-my-zsh}/custom}/plugins/zsh-completions/src' ~/.zshrc
+
+# 更新 .zshrc 文件以启用插件
+sed -i 's/plugins=(git)/plugins=(git zsh-autosuggestions zsh-syntax-highlighting sudo)/g' ~/.zshrc
+
+# 使更改生效
+source ~/.zshrc
+
+echo "Finished installing oh-my-zsh and its dependencies!"

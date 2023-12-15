@@ -1,30 +1,8 @@
-# shell prompt
-# from vim ":PromptlineSnapshot ~/.local/etc/shell_prompt.sh airline"
-if [ -f "$HOME/.local/etc/shell_prompt.sh" ]; then
-	. $HOME/.local/etc/shell_prompt.sh
-fi
-
-# enable bash completion
-# yum install bash-completion
-[[ $PS1 && -f /usr/local/share/bash-completion/bash_completion ]] &&
-	. /usr/local/share/bash-completion/bash_completion
-[[ $PS1 && -f /usr/share/bash-completion/bash_completion ]] &&
-	. /usr/share/bash-completion/bash_completion
-
-# git completion
-if [ -f /etc/bash_completion.d/git ]; then
-	. /etc/bash_completion.d/git
-fi
-
 # for .local lib
 export LD_RUN_PATH=$HOME/.local/lib:$LD_RUN_PATH
 export LD_LIBRARY_PATH=$HOME/.local/lib:$LD_LIBRARY_PATH
 export PKG_CONFIG_PATH=$HOME/.local/lib/pkgconfig:$PKG_CONFIG_PATH
 
-# for tmux
-export TERM=tmux-256color
-#export TERM=screen-256color
-#export TERM_ITALICS=true
 
 # for http proxy
 # export proxy_addr=
