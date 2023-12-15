@@ -40,8 +40,8 @@ fi
 bash "$HOME/.local/packages/$CONDA_NAME" -b -p "$CONDA_DIR"
 
 # Setting up environment variables
-sed -i "\:"$CONDA_DIR/bin":d" "$HOME/.bashrc"
-echo "export PATH=\"$CONDA_DIR/bin:\$PATH\"" >> "$HOME/.bashrc"
+sed -i "\:"$CONDA_DIR/bin":d" "$HOME/.zshrc"
+echo "export PATH=\"$CONDA_DIR/bin:\$PATH\"" >> "$HOME/.zshrc"
 
 echo "Installing Python packages"
 declare -a py_packages=("pynvim" 'python-lsp-server[all]' "black" "vim-vint" "pyls-isort" "pylsp-mypy" "requests")
@@ -70,8 +70,8 @@ if [[ -z "$(command -v rg)" ]] && [[ ! -f "$RIPGREP_DIR/rg" ]]; then
         tar zxvf "$RIPGREP_SRC_NAME" -C "$RIPGREP_DIR" --strip-components 1
     fi
 
-    sed -i "\:"$RIPGREP_DIR":d" "$HOME/.bashrc"
-    echo "export PATH=\"$RIPGREP_DIR:\$PATH\"" >> "$HOME/.bashrc"
+    sed -i "\:"$RIPGREP_DIR":d" "$HOME/.zshrc"
+    echo "export PATH=\"$RIPGREP_DIR:\$PATH\"" >> "$HOME/.zshrc"
 else
     echo "ripgrep is already installed. Skip installing it."
 fi
@@ -96,8 +96,8 @@ fi
 #     ./autogen.sh && ./configure --prefix="$CTAGS_DIR"
 #     make -j && make install
 
-#     sed -i "\:"$CTAGS_DIR/bin":d" "$HOME/.bashrc"
-#     echo "export PATH=\"$CTAGS_DIR/bin:\$PATH\"" >> "$HOME/.bashrc"
+#     sed -i "\:"$CTAGS_DIR/bin":d" "$HOME/.zshrc"
+#     echo "export PATH=\"$CTAGS_DIR/bin:\$PATH\"" >> "$HOME/.zshrc"
 # else
 #     echo "ctags is already installed. Skip installing it."
 # fi
@@ -124,8 +124,8 @@ if [[ "$USE_CACHE" = false || ! -f "$NVIM_DIR/bin/nvim" ]]; then
     echo "Extracting neovim"
     tar zxvf "$NVIM_SRC_NAME" --strip-components 1 -C "$NVIM_DIR"
 
-    sed -i "\:"$NVIM_DIR/bin":d" "$HOME/.bashrc"
-    echo "export PATH=\"$NVIM_DIR/bin:\$PATH\"" >> "$HOME/.bashrc"
+    sed -i "\:"$NVIM_DIR/bin":d" "$HOME/.zshrc"
+    echo "export PATH=\"$NVIM_DIR/bin:\$PATH\"" >> "$HOME/.zshrc"
 else
     echo "Nvim is already installed. Skip installing it."
 fi
