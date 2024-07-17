@@ -54,6 +54,14 @@ fi
 touch ~/.tmux.conf
 sed -i "\:$LOCAL_ETC/tmux.conf:d" ~/.tmux.conf
 echo "source $LOCAL_ETC/tmux.conf" >>~/.tmux.conf
+# Start a new tmux session briefly to install the plugins
+tmux new-session -d -s install_tmux_plugins
+
+# Install the plugins
+tmux run-shell ~/.tmux/plugins/tpm/scripts/install_plugins.sh
+
+# Kill the temporary session
+tmux kill-session -t install_tmux_plugins
 
 # update git config
 git config --global color.status auto

@@ -170,9 +170,7 @@ if [[ -d "$NVIM_CONFIG_DIR" ]]; then
     cd "$NVIM_CONFIG_DIR"
     git pull
 else
-    git clone --depth=1 https://github.com/AstroNvim/AstroNvim "$NVIM_CONFIG_DIR"
-    git clone https://github.com/edenz223/astronvim_config.git $NVIM_CONFIG_DIR/lua/user
-    cd "$NVIM_CONFIG_DIR"
+    git clone --depth 1 https://github.com/edenz223/neovimConfig "$NVIM_CONFIG_DIR"
 fi
 
 echo "Finished installing Nvim and its dependencies!"
