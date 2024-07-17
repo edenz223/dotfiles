@@ -185,5 +185,7 @@ tar xf lazygit.tar.gz lazygit
 sudo install lazygit /usr/local/bin
 rm -rf lazygit*
 
+nvim --headless +qa
+
 echo "Finished installing Nvim and its dependencies!"
 
