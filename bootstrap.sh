@@ -31,8 +31,7 @@ cp -rf etc/* $LOCAL_ETC/
 cp -rf bin/* $LOCAL_BIN/
 cp bootstrap.sh $LOCAL_BIN/
 
-if [ $machine == "Linux" ]; then
-	echo "install nvim"
+if [ "$(uname -s)" == "Linux" ] && command -v apt >/dev/null; then
 	bash ~/.local/dotfiles/setup_ubuntu2204.sh
 fi
 
@@ -41,20 +40,18 @@ sed -i "\:$LOCAL_ETC/init.sh:d" ~/.zshrc
 echo ". $LOCAL_ETC/init.sh" >>~/.zshrc
 zsh ~/.zshrc
 
-# source vimrc.vim
-# touch ~/.vimrc
-# sed -i "\:$LOCAL_ETC/vimrc.vim:d" ~/.vimrc
-# echo "source $LOCAL_ETC/vimrc.vim" >>~/.vimrc
 
-mkdir -p ~/.tmux/resurrect
+# source \tmp 
 if [ ! -d ~/.tmux/plugins/tpm ]; then
 	git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 fi
+mkdir -p ~/.tmux/resurrect
 # source tmux.conf
 touch ~/.tmux.conf
 sed -i "\:$LOCAL_ETC/tmux.conf:d" ~/.tmux.conf
 echo "source $LOCAL_ETC/tmux.conf" >>~/.tmux.conf
 
+# install tmux plugins
 if [ -d ~/.tmux/plugins/tpm ]; then
 	tmux new-session -d -s install_tmux_plugins
 	tmux run-shell ~/.tmux/plugins/tpm/scripts/install_plugins.sh
@@ -79,11 +76,6 @@ git config --global delta.side-by-side true
 git config --global merge.conflictstyle diff3
 git config --global diff.colorMoved default
 
-# install vim plug
-# vim_version=$(\vim --version | head -1)
-# if [[ $(echo $vim_version | awk -F '[ .]' '{print $5}') -gt 7 ]]; then
-# 	\vim +PlugInstall +qall
-# fi
 
 # install wezterm
 # rm -rf ~/.config/wezterm
