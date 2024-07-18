@@ -103,31 +103,6 @@ else
     echo "ripgrep is already installed. Skip installing it."
 fi
 
-#######################################################################
-# Ctags install
-#######################################################################
-# CTAGS_SRC_DIR=$HOME/.local/packages/ctags
-# CTAGS_DIR=$HOME/.local/tools/ctags
-# CTAGS_LINK="https://github.com/universal-ctags/ctags.git"
-# if [[ "$USE_CACHE" = false || ! -f "$CTAGS_DIR/bin/ctags" ]]; then
-#     echo "Install ctags"
-
-#     if [[ ! -d $CTAGS_SRC_DIR ]]; then
-#         mkdir -p "$CTAGS_SRC_DIR"
-#     else
-#         # Prevent an incomplete download.
-#         rm -rf "$CTAGS_SRC_DIR"
-#     fi
-
-#     git clone --depth=1 "$CTAGS_LINK" "$CTAGS_SRC_DIR" && cd "$CTAGS_SRC_DIR"
-#     ./autogen.sh && ./configure --prefix="$CTAGS_DIR"
-#     make -j && make install
-
-#     sed -i "\:"$CTAGS_DIR/bin":d" "$HOME/.zshrc"
-#     echo "export PATH=\"$CTAGS_DIR/bin:\$PATH\"" >> "$HOME/.zshrc"
-# else
-#     echo "ctags is already installed. Skip installing it."
-# fi
 
 #######################################################################
 # Nvim install
@@ -185,7 +160,7 @@ tar xf lazygit.tar.gz lazygit
 sudo install lazygit /usr/local/bin
 rm -rf lazygit*
 
-nvim --headless +qa
+eval "$NVIM_DIR/bin/nvim --headless +qa"
 
 echo "Finished installing Nvim and its dependencies!"
 
