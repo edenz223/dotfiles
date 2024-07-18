@@ -55,7 +55,7 @@ touch ~/.tmux.conf
 sed -i "\:$LOCAL_ETC/tmux.conf:d" ~/.tmux.conf
 echo "source $LOCAL_ETC/tmux.conf" >>~/.tmux.conf
 
-if [ ! -d ~/.tmux/plugins/tpm ]; then
+if [ -d ~/.tmux/plugins/tpm ]; then
 	tmux new-session -d -s install_tmux_plugins
 	tmux run-shell ~/.tmux/plugins/tpm/scripts/install_plugins.sh
 	tmux kill-session -t install_tmux_plugins
