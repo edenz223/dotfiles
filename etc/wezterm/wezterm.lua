@@ -126,8 +126,12 @@ config.tab_bar_style = {
 config.use_fancy_tab_bar = false
 config.window_decorations="INTEGRATED_BUTTONS|RESIZE"
 config.integrated_title_buttons = { 'Hide', 'Maximize', 'Close' }
-config.color_scheme = 'Catppuccin Frappe'
+config.color_scheme = 'Catppuccin Mocha'
 config.harfbuzz_features = {"calt=0", "clig=0", "liga=0"}
 config.check_for_updates = false
+
+config.keys = {
+    { key = 'l', mods = 'ALT', action = wezterm.action.ShowLauncher },
+}
 
 return config
