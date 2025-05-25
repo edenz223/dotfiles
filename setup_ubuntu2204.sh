@@ -108,9 +108,9 @@ fi
 # Nvim install
 #######################################################################
 NVIM_DIR=$HOME/.local/tools/nvim
-NVIM_SRC_NAME=$HOME/.local/packages/nvim-linux64.tar.gz
+NVIM_SRC_NAME=$HOME/.local/packages/nvim-linux-x86_64.tar.gz
 NVIM_CONFIG_DIR=$HOME/.config/nvim
-NVIM_LINK="https://github.com/neovim/neovim/releases/download/stable/nvim-linux64.tar.gz"
+NVIM_LINK="https://github.com/neovim/neovim/releases/download/v0.11.1/nvim-linux-x86_64.tar.gz"
 if [[ "$USE_CACHE" = false || ! -f "$NVIM_DIR/bin/nvim" ]]; then
     echo "Installing Nvim"
     echo "Creating nvim directory under tools directory"

@@ -39,6 +39,7 @@ fi
 sed -i "\:$LOCAL_ETC/init.sh:d" ~/.zshrc
 echo ". $LOCAL_ETC/init.sh" >>~/.zshrc
 zsh ~/.zshrc
+chsh -s $(which zsh)
 
 
 # source \tmp 
