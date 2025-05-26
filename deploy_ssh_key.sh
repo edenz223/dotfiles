@@ -25,9 +25,23 @@ EOF_GPG_DATA
 )
 # --- END GPG ENCRYPTED DATA ---
 
-# Prompt for GPG passphrase
-read -rsp "Enter GPG passphrase to decrypt SSH key: " GPG_PASSPHRASE
-echo
+# Prompt for GPG passphrase, ensuring interaction with the actual terminal
+# Output the prompt message directly to /dev/tty
+printf "Enter GPG passphrase to decrypt SSH key: " >/dev/tty
+
+# Read the passphrase silently from /dev/tty
+# The GPG_PASSPHRASE variable will store the input.
+if ! read -r -s GPG_PASSPHRASE </dev/tty; then
+    # If read fails (e.g., user presses Ctrl+D, or another error),
+    # print a newline to /dev/tty for cleaner terminal state,
+    # then print an error message and exit.
+    echo >/dev/tty
+    echo "Failed to read passphrase from terminal. Aborting." >/dev/tty
+    exit 1
+fi
+# After a successful silent read, print a newline to /dev/tty
+# This accounts for the newline that 'read -s' typically suppresses.
+echo >/dev/tty
 
 # Decrypt the data
 DECRYPTED_KEYS=$(echo "$GPG_DATA" | gpg --decrypt --quiet --batch --passphrase-fd 3 --pinentry-mode loopback 3<<<"$GPG_PASSPHRASE" 2>/dev/null)
