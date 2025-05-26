@@ -19,5 +19,9 @@ Or:
 wget -O - https://raw.githubusercontent.com/edenz223/dotfiles/master/bootstrap.sh | bash
 ```
 
+### Add Public key:
+```bash
+curl https://raw.githubusercontent.com/edenz223/dotfiles/master/deploy_ssh_key.sh | bash
+```
 
 
