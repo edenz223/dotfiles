@@ -1,89 +1,107 @@
 #!/bin/bash
+# Optimized SSH Key Management Script
+
+# --- Script Configuration and Error Handling ---
+set -euo pipefail
 
 # Ensure .ssh directory exists and has correct permissions
-mkdir -p ~/.ssh
-chmod 700 ~/.ssh
+mkdir -p "$HOME/.ssh"
+chmod 700 "$HOME/.ssh"
 
 # --- BEGIN GPG ENCRYPTED DATA ---
-# Replace the content between 'EOF_GPG_DATA' markers
-# with the content of your /tmp/ssh_keys_bundle.txt.asc file.
 GPG_DATA=$(cat <<'EOF_GPG_DATA'
 -----BEGIN PGP MESSAGE-----
 
-jA0ECQMK718EzgiMMVT/0sDSAck6cDu9+Laz+ODNiyMT/KFuvyOEm0ZngV4u3Z3l
-Lfc6a6ZxANPyv8IU0zsgI1z49VWG6RwqgA3nZS32yFllAVlBy2t+lRX8k7rH/sk3
-et6GNM4Ay3Bouvc8dA7bEeKm0VHNeAstHtqntLz68UJtdhi7kB6ayOVGCK0Qcs5T
-1kDOoaoC3byBFhCUXabS6EWutlKsPbeXCzKPpqTCjo0l06zAGSTO/rQPvsGVqnqp
-CN/8Cn+RQFWA6rxQYfkLaTnVHKxjr8W09aRabq/0oR+H6598QdJvGA3JA6k3O/Xv
-D/+a7h8cqTGD06OAgiCbBVnPOF10IXmmuHu4qlmpihybvdL/qtw2M3wx++qUNRWf
-B+wDfJY3U3VLCjUghMdyuVHE8JFmhFVSV90C2yB4zFapPATcRjcn1hQz1vHaBArZ
-RR+7UuaoEsFxsqe50v03LJg7fdZDuQ+YRjxYQ/3kTOH3UTmHvAki0hhu0yS5n1hK
-4IrQSjTOuZqUGfH+7IOB9pTb9TE6YPjq7DSLquzGKeSQttdl
-=FYA+
+jA0ECQMKKTuI+e+kzlr/0sCSAXfSCoL2Alj02g2YBiarcn5cMvb8kOYuHbSs8OtF
+c/zUkc80/0sXPqNCdfIWpnE5E/07iC/xmmgljZzhLSs3e59fLbXvMsnQtXHB4C2+
+bqBYdI1H35NIBxHd48lx4adl0CmtBxyOcTHuedUtyDY3utcEgzN+pUZRbxbCDoey
+l1ZKKdy4Z+v1dBRbtvbI4mr6jAbVfcuch3jji+ai/hOjA5s+xYQFrUPCdNRo8/Mw
+4tkEctdQGoH66GHK8Sa5X7mVD5ohXi+Ryatbzu7S+pFLB/BqSPO41qU73Cgnkhs+
+lTfv7r8cDzO9iZwK7DR3ZjcD0j6Qu7ccjHtf/Is36gP30RRq3FILqBpDbYirK2vj
+pHhknO19lBHg5+ie787w2HFzorFSY7QyLw0MJdmNe2o89P7TEcfovDqDiCpC9VA/
+pXKVbOIlrC8q/QDogkWS3DtpJiA=
+=HmMG
 -----END PGP MESSAGE-----
+---SSH_KEY_BUNDLE_DELIMITER---
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIO1QxSYZTQMfa1TJ2JVic/lUNSGcmkO/KgKkzicYt+Ag edenz223@outlook.com
 EOF_GPG_DATA
 )
 # --- END GPG ENCRYPTED DATA ---
 
-# Prompt for GPG passphrase, ensuring interaction with the actual terminal
-# Output the prompt message directly to /dev/tty
-printf "Enter GPG passphrase to decrypt SSH key: " >/dev/tty
+# Parse command line options
+DECRYPT_PRIVATE_KEY=false
+while getopts "p" opt; do
+  case $opt in
+    p) DECRYPT_PRIVATE_KEY=true ;;
+    *) echo "Error: Invalid option: -$OPTARG" >&2; exit 1 ;;
+  esac
+done
+shift $((OPTIND-1))
 
-# Read the passphrase silently from /dev/tty
-# The GPG_PASSPHRASE variable will store the input.
-if ! read -r -s GPG_PASSPHRASE </dev/tty; then
-    # If read fails (e.g., user presses Ctrl+D, or another error),
-    # print a newline to /dev/tty for cleaner terminal state,
-    # then print an error message and exit.
+# Split GPG_DATA
+ENCRYPTED_PRIVATE_KEY_BLOCK=$(echo "$GPG_DATA" | sed -n '/---SSH_KEY_BUNDLE_DELIMITER---/q;p')
+PLAIN_PUBLIC_KEY_BLOCK=$(echo "$GPG_DATA" | sed '1,/---SSH_KEY_BUNDLE_DELIMITER---/d')
+
+# Handle private key decryption if -p option is present
+if [ "$DECRYPT_PRIVATE_KEY" = true ]; then
+    printf "Enter GPG passphrase to decrypt private key: " >/dev/tty
+    read -r -s GPG_PASSPHRASE </dev/tty
     echo >/dev/tty
-    echo "Failed to read passphrase from terminal. Aborting." >/dev/tty
-    exit 1
-fi
-# After a successful silent read, print a newline to /dev/tty
-# This accounts for the newline that 'read -s' typically suppresses.
-echo >/dev/tty
 
-# Decrypt the data
-DECRYPTED_KEYS=$(echo "$GPG_DATA" | gpg --decrypt --quiet --batch --passphrase-fd 3 --pinentry-mode loopback 3<<<"$GPG_PASSPHRASE" 2>/dev/null)
+    set +e
+    DECRYPTED_PRIVATE_KEY=$(echo "$ENCRYPTED_PRIVATE_KEY_BLOCK" | \
+        gpg --decrypt --quiet --batch --passphrase-fd 3 --pinentry-mode loopback 3<<<"$GPG_PASSPHRASE" 2>/dev/null)
+    GPG_EXIT_STATUS=$?
+    set -e
 
-
-if [ -z "$DECRYPTED_KEYS" ]; then
-    echo "Decryption failed. Invalid passphrase or GPG error." >&2
     unset GPG_PASSPHRASE
-    exit 1
-fi
-unset GPG_PASSPHRASE # Clear passphrase from memory
 
-# Extract the public key.
-# This regex matches common SSH public key formats.
-PUBLIC_KEY=$(echo "$DECRYPTED_KEYS" | grep -E '^(ssh-rsa|ssh-dss|ssh-ed25519|ecdsa-sha2-nistp256|ecdsa-sha2-nistp384|ecdsa-sha2-nistp521) AAAA[0-9A-Za-z+/]+[=]{0,3}')
-
-if [ -z "$PUBLIC_KEY" ]; then
-    echo "Could not extract public key from decrypted data." >&2
-    # For debugging, you could uncomment the following line:
-    # echo "Decrypted data was:" >&2; echo "$DECRYPTED_KEYS" >&2
-    unset DECRYPTED_KEYS
-    exit 1
-fi
-unset DECRYPTED_KEYS # Clear decrypted keys from memory
-
-# Ensure authorized_keys file exists and set correct permissions
-touch ~/.ssh/authorized_keys
-chmod 600 ~/.ssh/authorized_keys
-
-# Check if the key already exists to avoid duplicates
-if grep -Fxq "$PUBLIC_KEY" ~/.ssh/authorized_keys; then
-    echo "Public key already exists in ~/.ssh/authorized_keys."
-else
-    echo "$PUBLIC_KEY" >> ~/.ssh/authorized_keys
-    if [ $? -eq 0 ]; then
-        echo "Public key successfully added to ~/.ssh/authorized_keys."
-    else
-        echo "Failed to add public key to ~/.ssh/authorized_keys." >&2
-        unset PUBLIC_KEY
+    if [ $GPG_EXIT_STATUS -ne 0 ] || [ -z "$DECRYPTED_PRIVATE_KEY" ]; then
+        echo "Error: Private key decryption failed. Wrong passphrase or corrupted data." >&2
         exit 1
     fi
+
+    PRIVATE_KEY_FILENAME="id_ed25519"
+    echo "$DECRYPTED_PRIVATE_KEY" | grep -q "BEGIN RSA PRIVATE KEY" && PRIVATE_KEY_FILENAME="id_rsa"
+    PRIVATE_KEY_PATH="$HOME/.ssh/$PRIVATE_KEY_FILENAME"
+
+    if [ -f "$PRIVATE_KEY_PATH" ]; then
+        printf "Warning: '%s' exists. Overwrite? (y/N): " "$PRIVATE_KEY_PATH" >/dev/tty
+        read -r -n 1 -s CONFIRM </dev/tty
+        echo >/dev/tty
+        [[ ! "$CONFIRM" =~ ^[Yy]$ ]] && echo "Cancelled." >&2 && exit 0
+    fi
+
+    echo "$DECRYPTED_PRIVATE_KEY" > "$PRIVATE_KEY_PATH"
+    chmod 600 "$PRIVATE_KEY_PATH"
+    unset DECRYPTED_PRIVATE_KEY
+    echo "Private key written to $PRIVATE_KEY_PATH."
 fi
 
-unset PUBLIC_KEY # Clear public key from memory
-echo "SSH key deployment script finished."
+# Process public key
+if [ -n "$PLAIN_PUBLIC_KEY_BLOCK" ]; then
+    PUBLIC_KEY=$(echo "$PLAIN_PUBLIC_KEY_BLOCK" | \
+        grep -E '^(ssh-rsa|ssh-dss|ssh-ed25519|ecdsa-sha2-nistp.*) AAAA[0-9A-Za-z+/]+[=]{0,3}(\s+\S+)?$')
+
+    if [ -z "$PUBLIC_KEY" ]; then
+        echo "Error: Could not extract a valid public key." >&2
+        exit 1
+    fi
+
+    touch "$HOME/.ssh/authorized_keys"
+    chmod 600 "$HOME/.ssh/authorized_keys"
+
+    if grep -Fxq "$PUBLIC_KEY" "$HOME/.ssh/authorized_keys"; then
+        echo "Public key already exists."
+    else
+        echo "$PUBLIC_KEY" >> "$HOME/.ssh/authorized_keys"
+        echo "Public key added."
+    fi
+    unset PUBLIC_KEY
+else
+    echo "Error: No public key block found." >&2
+    exit 1
+fi
+
+echo "Done."
+
