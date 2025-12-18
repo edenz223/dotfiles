@@ -32,7 +32,17 @@ cp -rf bin/* $LOCAL_BIN/
 cp bootstrap.sh $LOCAL_BIN/
 
 if [ "$(uname -s)" == "Linux" ] && command -v apt >/dev/null; then
-	bash ~/.local/dotfiles/setup_ubuntu2204.sh
+	# Only run the Ubuntu setup script on Debian-based systems
+	if [ -r /etc/os-release ]; then
+		. /etc/os-release
+		if [[ "${ID:-}" == "ubuntu" || "${ID:-}" == "debian" || "${ID_LIKE:-}" == *debian* ]]; then
+			bash ~/.local/dotfiles/setup_ubuntu2204.sh
+		else
+			echo "Skipping setup_ubuntu2204.sh (requires Debian-based distro)."
+		fi
+	else
+		echo "Skipping setup_ubuntu2204.sh (/etc/os-release not found)."
+	fi
 fi
 
 # source init.sh
@@ -78,4 +88,3 @@ git config --global delta.light false
 git config --global delta.side-by-side true
 git config --global merge.conflictstyle diff3
 git config --global diff.colorMoved default
-
