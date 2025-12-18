@@ -2,13 +2,20 @@
 set -e
 
 sudo apt update
-sudo apt install -y zsh git fzf curl
+sudo apt install -y zsh git curl
+
 # Install oh-my-zsh non-interactively if not present
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
   RUNZSH=no CHSH=no \
   sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 fi
-
+# Install fzf from source so it stays up to date regardless of distro packages
+if [ ! -d "$HOME/.fzf" ]; then
+  git clone --depth 1 https://github.com/junegunn/fzf.git "$HOME/.fzf"
+  "$HOME/.fzf/install" --all
+else
+  echo "fzf already installed in ~/.fzf. Run ~/.fzf/install to update if needed."
+fi
 
 # Plugins
 ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
@@ -43,7 +50,7 @@ sed -i 's/^plugins=.*/plugins=(git zsh-autosuggestions zsh-syntax-highlighting z
 # Make zsh default shell
 if [ "$SHELL" != "$(command -v zsh)" ]; then
   chsh -s "$(command -v zsh)"
-  echo "Default shell changed to zsh. Log out and log in again to use it."
+  echo "Default shell changed to zsh."
 fi
 
-echo "Done. Start a new shell and run: source ~/.zshrc"
+echo "Tip: run 'exec zsh' in this terminal to start using it immediately."
