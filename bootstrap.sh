@@ -39,7 +39,7 @@ fi
 sed -i "\:$LOCAL_ETC/init.sh:d" ~/.zshrc
 echo ". $LOCAL_ETC/init.sh" >>~/.zshrc
 zsh ~/.zshrc
-chsh -s $(which zsh)
+sudo chsh -s "$(which zsh)" "$USER"
 
 
 # source \tmp 
@@ -79,12 +79,3 @@ git config --global delta.side-by-side true
 git config --global merge.conflictstyle diff3
 git config --global diff.colorMoved default
 
-
-# install wezterm
-# rm -rf ~/.config/wezterm
-# mkdir -p ~/.config
-# ln -s $LOCAL_ETC/wezterm ~/.config/wezterm
-
-# install stylua config
-# rm -rf ~/.config/stylua
-# ln -s $LOCAL_ETC/stylua ~/.config/stylua
