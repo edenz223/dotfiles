@@ -31,17 +31,20 @@ cp -rf etc/* $LOCAL_ETC/
 cp -rf bin/* $LOCAL_BIN/
 cp bootstrap.sh $LOCAL_BIN/
 
-if [ "$(uname -s)" == "Linux" ] && command -v apt >/dev/null; then
-	# Only run the Ubuntu setup script on Debian-based systems
+# Run unified setup script for Linux systems
+if [ "$(uname -s)" == "Linux" ]; then
 	if [ -r /etc/os-release ]; then
 		. /etc/os-release
-		if [[ "${ID:-}" == "ubuntu" || "${ID:-}" == "debian" || "${ID_LIKE:-}" == *debian* ]]; then
-			bash ~/.local/dotfiles/setup_ubuntu2204.sh
+		if [[ "${ID:-}" == "ubuntu" || "${ID:-}" == "debian" || "${ID_LIKE:-}" == *debian* ]] || \
+		   [[ "${ID:-}" == "arch" || "${ID:-}" == "manjaro" || "${ID_LIKE:-}" == *arch* ]]; then
+			echo "Running unified setup script for ${ID:-unknown}"
+			bash ~/.local/dotfiles/setup.sh
 		else
-			echo "Skipping setup_ubuntu2204.sh (requires Debian-based distro)."
+			echo "Unsupported Linux distribution: ${ID:-unknown}"
+			echo "Supported: Ubuntu, Debian, Arch Linux, Manjaro"
 		fi
 	else
-		echo "Skipping setup_ubuntu2204.sh (/etc/os-release not found)."
+		echo "Cannot detect Linux distribution (/etc/os-release not found)."
 	fi
 fi
 
