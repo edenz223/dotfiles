@@ -53,10 +53,12 @@ sed -i "\:$LOCAL_ETC/tmux.conf:d" ~/.tmux.conf
 echo "source $LOCAL_ETC/tmux.conf" >>~/.tmux.conf
 
 # install tmux plugins
-if [ -d ~/.tmux/plugins/tpm ]; then
+if command -v tmux >/dev/null 2>&1 && [ -d ~/.tmux/plugins/tpm ]; then
 	tmux new-session -d -s install_tmux_plugins
 	tmux run-shell ~/.tmux/plugins/tpm/scripts/install_plugins.sh
 	tmux kill-session -t install_tmux_plugins
+else
+	echo "Skipping tmux plugin install (tmux not available?)."
 fi
 
 # update git config

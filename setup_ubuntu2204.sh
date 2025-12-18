@@ -1,8 +1,30 @@
 #!/bin/bash
 set -x
 
-USE_CACHE=false
-USE_CACHE=true
+USE_CACHE="${USE_CACHE:-true}"
+
+download_with_cache() {
+	local url="$1"
+	local destination="$2"
+
+	if [[ "$USE_CACHE" = false || ! -f "$destination" ]]; then
+		mkdir -p "$(dirname "$destination")"
+		echo "Downloading ${url} -> ${destination}"
+		curl -L --fail -o "$destination" "$url"
+	else
+		echo "Using cached $(basename "$destination")"
+	fi
+}
+
+clone_if_missing() {
+	local repo="$1"
+	local target="$2"
+	if [[ -d "$target" ]]; then
+		echo "$target already exists. Skipping clone."
+	else
+		git clone "$repo" "$target"
+	fi
+}
  
 #######################################################################
 # pre install
@@ -20,13 +42,14 @@ sudo chsh -s "$(which zsh)" "${USER}"
  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 
 # 安装 zsh-autosuggestions 插件
-git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+ZSH_CUSTOM_DIR=${ZSH_CUSTOM:-${ZSH:-~/.oh-my-zsh}/custom}
+clone_if_missing https://github.com/zsh-users/zsh-autosuggestions "${ZSH_CUSTOM_DIR}/plugins/zsh-autosuggestions"
 
 # 安装 zsh-syntax-highlighting 插件
-git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+clone_if_missing https://github.com/zsh-users/zsh-syntax-highlighting.git "${ZSH_CUSTOM_DIR}/plugins/zsh-syntax-highlighting"
 
 # 安装 zsh-completions 插件
-git clone https://github.com/zsh-users/zsh-completions ${ZSH_CUSTOM:-${ZSH:-~/.oh-my-zsh}/custom}/plugins/zsh-completions、
+clone_if_missing https://github.com/zsh-users/zsh-completions "${ZSH_CUSTOM_DIR}/plugins/zsh-completions"
 
 # 在 .zshrc 文件中添加一行来更新 FPATH
 sed -i '/^source \$ZSH\/oh-my-zsh.sh/i fpath+=${ZSH_CUSTOM:-${ZSH:-~/.oh-my-zsh}/custom}/plugins/zsh-completions/src' ~/.zshrc
@@ -56,9 +79,7 @@ CONDA_LINK="https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-p
 echo "Installing Python in user HOME"
 echo "Downloading and installing miniconda"
 
-if [[ "$USE_CACHE" = false || ! -f "$HOME/.local/packages/$CONDA_NAME" ]]; then
-	curl -Lo "$HOME/.local/packages/$CONDA_NAME" $CONDA_LINK
-fi
+download_with_cache "$CONDA_LINK" "$HOME/.local/packages/$CONDA_NAME"
 
 # Install conda silently
 if [[ -d $CONDA_DIR ]]; then
@@ -85,10 +106,8 @@ RIPGREP_SRC_NAME=$HOME/.local/packages/ripgrep.tar.gz
 RIPGREP_LINK="https://github.com/BurntSushi/ripgrep/releases/download/12.0.0/ripgrep-12.0.0-x86_64-unknown-linux-musl.tar.gz"
 if [[ -z "$(command -v rg)" ]] && [[ ! -f "$RIPGREP_DIR/rg" ]]; then
     echo "Install ripgrep"
-    if [[ "$USE_CACHE" = false || ! -f $RIPGREP_SRC_NAME ]]; then
-        echo "Downloading ripgrep and renaming"
-        wget $RIPGREP_LINK -O "$RIPGREP_SRC_NAME"
-    fi
+	echo "Downloading ripgrep and renaming"
+	download_with_cache "$RIPGREP_LINK" "$RIPGREP_SRC_NAME"
 
     if [[ ! -d "$RIPGREP_DIR" ]]; then
         echo "Creating ripgrep directory under tools directory"
@@ -119,10 +138,8 @@ if [[ "$USE_CACHE" = false || ! -f "$NVIM_DIR/bin/nvim" ]]; then
         mkdir -p "$NVIM_DIR"
     fi
 
-    if [[ "$USE_CACHE" = false || ! -f $NVIM_SRC_NAME ]]; then
-        echo "Downloading Nvim"
-        wget "$NVIM_LINK" -O "$NVIM_SRC_NAME"
-    fi
+	echo "Downloading Nvim"
+	download_with_cache "$NVIM_LINK" "$NVIM_SRC_NAME"
     echo "Extracting neovim"
     tar zxvf "$NVIM_SRC_NAME" --strip-components 1 -C "$NVIM_DIR"
 
@@ -149,18 +166,20 @@ else
 fi
 
 # installl gdu for disk usage analyzer
-curl -L https://github.com/dundee/gdu/releases/latest/download/gdu_linux_amd64.tgz | tar xz
+GDU_ARCHIVE="$HOME/.local/packages/gdu_linux_amd64.tgz"
+download_with_cache "https://github.com/dundee/gdu/releases/latest/download/gdu_linux_amd64.tgz" "$GDU_ARCHIVE"
+tar xzf "$GDU_ARCHIVE" gdu_linux_amd64
 chmod +x gdu_linux_amd64
 sudo mv gdu_linux_amd64 /usr/bin/gdu
 
 # install lazygit
 LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*')
-curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
-tar xf lazygit.tar.gz lazygit
+LAZYGIT_ARCHIVE="$HOME/.local/packages/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
+download_with_cache "https://github.com/jesseduffield/lazygit/releases/download/v${LAZYGIT_VERSION}/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz" "$LAZYGIT_ARCHIVE"
+tar xf "$LAZYGIT_ARCHIVE" lazygit
 sudo install lazygit /usr/local/bin
-rm -rf lazygit*
+rm -f lazygit
 
 eval "$NVIM_DIR/bin/nvim --headless +qa"
 
 echo "Finished installing Nvim and its dependencies!"
-

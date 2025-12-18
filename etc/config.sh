@@ -35,7 +35,11 @@ function set_tmux_pwd() {
 	return 0
 }
 function my_cd() {
-	\cd $1
+	if [ $# -eq 0 ]; then
+		\cd "$HOME"
+	else
+		\cd "$@"
+	fi
 	set_tmux_pwd
 }
 set_tmux_pwd
