@@ -53,7 +53,6 @@ set completeopt=menu,menuone
 
 " 性能优化
 set lazyredraw                " 宏执行时不重绘
-set ttyfast                   " 快速终端连接
 
 " 状态栏设置
 set statusline=%F%m%r%h%w\ [%{&ff}]\ [%Y]\ [%04l,%04v]\ [%p%%]\ [%L]
