@@ -81,6 +81,25 @@ setup_lazygit_from_source() {
     log_success "lazygit installed (version: $LAZYGIT_VERSION)"
 }
 
+install_fzf() {
+    log_info "Installing fzf from source"
+
+    local fzf_dir="${FZF_INSTALL_DIR:-$HOME/.fzf}"
+
+    if [[ ! -d "$fzf_dir" ]]; then
+        clone_if_missing "$FZF_REPO" "$fzf_dir"
+
+        if [[ -x "$fzf_dir/install" ]]; then
+            "$fzf_dir/install" --all
+            log_success "fzf installed in $fzf_dir"
+        else
+            log_error "fzf install script not found at $fzf_dir/install"
+        fi
+    else
+        log_info "fzf already installed in $fzf_dir. Run $fzf_dir/install to update if needed."
+    fi
+}
+
 setup_tools() {
     log_info "=== Setting up additional tools ==="
 

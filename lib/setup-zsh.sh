@@ -1,6 +1,6 @@
 #!/bin/bash
 # Zsh setup module
-# Installs and configures zsh, oh-my-zsh, and plugins
+# Installs and configures zsh, oh-my-zsh, plugins, and fzf
 
 setup_zsh() {
     log_info "=== Setting up Zsh and oh-my-zsh ==="
@@ -23,6 +23,9 @@ setup_zsh() {
         log_info "oh-my-zsh already installed"
     fi
 
+    # Install fzf (source)
+    install_fzf
+
     # Setup custom plugin directory
     local ZSH_CUSTOM_DIR=${ZSH_CUSTOM:-${ZSH:-~/.oh-my-zsh}/custom}
 
@@ -38,6 +41,14 @@ setup_zsh() {
     log_info "Installing zsh-completions plugin"
     clone_if_missing "$ZSH_COMPLETIONS_REPO" "${ZSH_CUSTOM_DIR}/plugins/zsh-completions"
 
+    # Install zsh-z plugin
+    log_info "Installing zsh-z plugin"
+    clone_if_missing "$ZSH_Z_REPO" "${ZSH_CUSTOM_DIR}/plugins/zsh-z"
+
+    # Install fzf-tab plugin
+    log_info "Installing fzf-tab plugin"
+    clone_if_missing "$FZF_TAB_REPO" "${ZSH_CUSTOM_DIR}/plugins/fzf-tab"
+
     # Update .zshrc to add fpath for completions
     if ! grep -q "fpath+=" "$HOME/.zshrc" 2>/dev/null; then
         log_info "Adding zsh-completions to fpath"
@@ -47,7 +58,7 @@ setup_zsh() {
     # Update .zshrc to enable plugins
     if grep -q "plugins=(git)" "$HOME/.zshrc" 2>/dev/null; then
         log_info "Enabling zsh plugins"
-        sed -i 's/plugins=(git)/plugins=(git zsh-autosuggestions zsh-syntax-highlighting sudo)/g' ~/.zshrc
+        sed -i 's/plugins=(git)/plugins=(git sudo zsh-autosuggestions zsh-syntax-highlighting zsh-z fzf fzf-tab)/g' ~/.zshrc
         log_success "Zsh plugins enabled"
     fi
 

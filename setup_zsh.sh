@@ -100,7 +100,7 @@ if ! grep -q "oh-my-zsh.sh" "$HOME/.zshrc" 2>/dev/null; then
 fi
 
 # Set plugins
-sed -i 's/^plugins=.*/plugins=(git zsh-autosuggestions zsh-syntax-highlighting zsh-z fzf fzf-tab)/' "$HOME/.zshrc"
+sed -i 's/^plugins=.*/plugins=(git sudo zsh-autosuggestions zsh-syntax-highlighting zsh-z fzf fzf-tab)/' "$HOME/.zshrc"
 
 # Make zsh default shell
 if [ "$SHELL" != "$(command -v zsh)" ]; then
