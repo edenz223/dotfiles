@@ -2,13 +2,13 @@
 set -e
 
 sudo apt update
-
+sudo apt install -y zsh git fzf curl
 # Install oh-my-zsh non-interactively if not present
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
   RUNZSH=no CHSH=no \
   sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 fi
-sudo apt install -y zsh git fzf curl
+
 
 # Plugins
 ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
