@@ -1,8 +1,63 @@
 #!/usr/bin/env bash
-set -e
+#######################################################################
+# Standalone Zsh Setup Script (Server-friendly)
+# Can be run independently on any server
+# Supports: Ubuntu/Debian, Arch Linux, CentOS/RHEL
+#######################################################################
 
-sudo apt update
-sudo apt install -y zsh git curl
+set -euo pipefail
+
+# Color output functions
+log_info() { echo -e "\033[0;34m[INFO]\033[0m $*"; }
+log_success() { echo -e "\033[0;32m[✓]\033[0m $*"; }
+log_error() { echo -e "\033[0;31m[✗]\033[0m $*" >&2; }
+
+# Detect OS
+detect_os() {
+    if [[ -f /etc/os-release ]]; then
+        . /etc/os-release
+        echo "${ID:-unknown}"
+    else
+        echo "unknown"
+    fi
+}
+
+# Install zsh, git, curl based on OS
+install_dependencies() {
+    local os_id
+    os_id=$(detect_os)
+
+    log_info "Detected OS: $os_id"
+
+    case "$os_id" in
+        ubuntu|debian)
+            log_info "Installing dependencies (Ubuntu/Debian)"
+            sudo apt update
+            sudo apt install -y zsh git curl
+            ;;
+        arch|manjaro)
+            log_info "Installing dependencies (Arch Linux)"
+            sudo pacman -S --noconfirm zsh git curl
+            ;;
+        centos|rhel|rocky|almalinux)
+            log_info "Installing dependencies (RHEL-based)"
+            sudo yum install -y zsh git curl
+            ;;
+        *)
+            log_error "Unsupported OS: $os_id"
+            log_error "Please install zsh, git, and curl manually"
+            exit 1
+            ;;
+    esac
+
+    log_success "Dependencies installed"
+}
+
+# Check if dependencies are installed
+if ! command -v zsh >/dev/null 2>&1 || ! command -v git >/dev/null 2>&1 || ! command -v curl >/dev/null 2>&1; then
+    log_info "Installing required dependencies..."
+    install_dependencies
+fi
 
 # Install oh-my-zsh non-interactively if not present
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
